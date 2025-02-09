@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17.2
+    ports:
+      - 5432:5432
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=michael
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=chat
+    restart: unless-stopped
