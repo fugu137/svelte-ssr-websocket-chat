@@ -1,5 +1,5 @@
 services:
-  postgres:
+  chat_db:
     image: postgres:17.2
     ports:
       - 5432:5432
@@ -7,7 +7,13 @@ services:
       - ./initdb.d:/docker-entrypoint-initdb.d
       - ./pgdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=michael
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=chat
+      POSTGRES_DB: chat
+      POSTGRES_USER: chat
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     restart: unless-stopped
+    secrets:
+      - postgres_password
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
