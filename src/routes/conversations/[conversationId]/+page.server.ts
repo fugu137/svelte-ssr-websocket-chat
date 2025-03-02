@@ -12,12 +12,12 @@ export const load: ServerLoad = async ({ parent, params, locals }) => {
 	const conversationId = Number(params.conversationId);
 
 	const conversation = conversations.find((conv: Conversation) => conv.id === conversationId) as Conversation;
-	const users = await getConversationMembers(conversationId);
+	const members = await getConversationMembers(conversationId);
 	const messages = await getMessages(locals.user.id, conversationId);
 
 	return {
 		conversation,
-		users,
+		members,
 		messages
 	};
 };

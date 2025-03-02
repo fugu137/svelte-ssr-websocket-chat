@@ -6,7 +6,7 @@
 
 	let { data }: PageProps = $props();
 
-	let { conversation, users, messages } = $derived(data);
+	let { conversation, members, messages } = $derived(data);
 
 	let message = $state<string>("");
 	let isSending = $state<boolean>(false);
@@ -24,7 +24,7 @@
 	}
 
 	const getUsername = (userId: number) => {
-		return users.find((user) => user.id === userId)?.username;
+		return members.find((member) => member.id === userId)?.username;
 	};
 </script>
 
