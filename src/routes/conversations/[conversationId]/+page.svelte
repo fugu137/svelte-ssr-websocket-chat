@@ -113,10 +113,10 @@
 
 		input {
 			width: calc(100% - 108px);
-			padding: 10px;
+			padding: 8px;
 		}
 		button {
-			padding: 10px 0;
+			padding: 8px 0;
 			width: 100px;
 		}
 	}
