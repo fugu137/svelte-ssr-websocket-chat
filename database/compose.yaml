@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: chat
       POSTGRES_USER: chat
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    restart: unless-stopped
+    restart: no
     secrets:
       - postgres_password
 

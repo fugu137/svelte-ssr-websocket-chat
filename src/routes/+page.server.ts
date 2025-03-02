@@ -1,4 +1,4 @@
-import { getUser } from "$lib/server/userService";
+import { getUser } from "$lib/server/users";
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 import { JWT_SECRET } from "$env/static/private";

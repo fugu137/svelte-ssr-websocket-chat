@@ -1,4 +1,4 @@
-import { getConversations } from "$lib/server/messageService";
+import { getConversations } from "$lib/server/messages";
 import { redirect, type ServerLoad } from "@sveltejs/kit";
 
 export const load: ServerLoad = async ({ params, locals }) => {

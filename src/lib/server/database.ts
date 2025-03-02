@@ -10,7 +10,20 @@ const sql = postgres({
 	transform: postgres.toCamel
 });
 
-export const getUser = async (username: string) => {
+export const getUserById = async (userId: number) => {
+	const [user] = await sql<User[]>`
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            id = ${userId}
+    `;
+
+	return user;
+};
+
+export const getUserByUsername = async (username: string) => {
 	const [user] = await sql<User[]>`
         SELECT
             *
@@ -40,11 +53,28 @@ export const getConversations = async (userId: number) => {
 	return conversations;
 };
 
+export const getConversationMembers = async (conversationId: number) => {
+	const members = await sql<User[]>`
+        SELECT
+            users.id,
+            users.username
+        FROM 
+            users_conversations
+        INNER JOIN
+            users
+            ON user_id = users.id
+        WHERE
+            conversation_id = ${conversationId}
+    `;
+
+	return members;
+};
+
 export const getMessages = async (conversationId: number) => {
-	const chatMessages = await sql<Message[]>`
+	const chatMessages = await sql<(Message & { senderName: string })[]>`
         SELECT 
             messages.id, 
-            users.username as "sender", 
+            users.id as "senderId", 
             messages.body 
         FROM 
             conversations_messages 
@@ -72,7 +102,7 @@ export const insertMessage = async (senderId: number, conversationId: number, me
                 *
         `;
 
-		const [insertedConversation] = await sql`
+		const [insertedConversation] = await sql<Conversation[]>`
             INSERT INTO 
                 conversations_messages (conversation_id, message_id)
             VALUES 
@@ -84,5 +114,5 @@ export const insertMessage = async (senderId: number, conversationId: number, me
 		return [insertedMessage, insertedConversation];
 	});
 
-	return [insertedMessage, insertedConversation];
+	return [insertedMessage, insertedConversation] as const;
 };
