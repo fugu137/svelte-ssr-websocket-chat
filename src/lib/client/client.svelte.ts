@@ -7,7 +7,7 @@ const websocket = new WebSocket("ws://localhost:5174");
 websocket.addEventListener("open", (event) => {
 	console.log(event);
 
-	websocket.send("Hello from the client");
+	websocket.send("Connected");
 });
 
 websocket.addEventListener("close", (event) => {
@@ -27,7 +27,10 @@ websocket.addEventListener("message", (event) => {
 });
 
 export default {
-	get notifications() {
+	getNotifications: () => {
 		return notifications;
-	}
+	},
+    clearNotifications: () => {
+        notifications = [];
+    }
 };
