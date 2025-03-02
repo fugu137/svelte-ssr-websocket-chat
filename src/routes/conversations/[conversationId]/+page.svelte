@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
 	import { enhance } from "$app/forms";
-	import client from "$lib/client/client.svelte";
+	import notifications from "$lib/client/notifications.svelte";
 	import { invalidateAll } from "$app/navigation";
 
 	let { data }: PageProps = $props();
@@ -9,12 +9,10 @@
 	let { conversation, users, messages } = $derived(data);
 
 	let message = $state<string>("");
-	let sending = $state<boolean>(false);
+	let isSending = $state<boolean>(false);
 
 	$effect(() => {
-		const notifications = client.getNotifications();
-
-		if (notifications.length) {
+		if (notifications.get(conversation.id)?.length) {
 			fetchLatestMessages();
 		}
 	});
@@ -22,7 +20,7 @@
 	const fetchLatestMessages = () => {
 		invalidateAll();
 
-		client.clearNotifications();
+		notifications.clear(conversation.id);
 	}
 
 	const getUsername = (userId: number) => {
@@ -39,7 +37,7 @@
 
 <h3>Notifications</h3>
 <ul>
-	{#each client.getNotifications() as { message }}
+	{#each notifications.get(conversation.id) as { message }}
 		<li>{getUsername(message.senderId)}: {message.body}</li>
 	{/each}
 </ul>
@@ -47,12 +45,12 @@
 <form
 	method="POST"
 	use:enhance={() => {
-		sending = true;
+		isSending = true;
 
 		return async ({ update }) => {
 			await update();
-			
-			sending = false;
+
+			isSending = false;
 
 			invalidateAll();
 		};
@@ -62,7 +60,7 @@
 	<button>Send</button>
 </form>
 
-{#if sending}
+{#if isSending}
 	<p>Sending...</p>
 {/if}
 
