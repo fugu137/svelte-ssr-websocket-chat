@@ -3,7 +3,8 @@ import { createServer } from "http";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
-import type { User, Notification, Message } from "./types";
+import type { User, Notification, Message, NotificationType } from "./types";
+import { getConversationMembers } from "./messages";
 
 const PORT = 5174 as const;
 
@@ -35,8 +36,24 @@ server.on("upgrade", (request, socket, head) => {
 wss.on("connection", async (ws: WebSocket, request: any, user: User) => {
 	console.log("Connected to client", user);
 
-	ws.on("message", (message) => {
+	ws.on("message", async (message: string) => {
 		console.log(`Message from the client ${user.id}: ${message}`);
+
+		const notification = JSON.parse(message) as Notification<NotificationType>;
+
+		if (notification.type === "ACTIVITY") {
+			const members = await getConversationMembers(notification.data.conversationId);
+
+			members.forEach((member) => {
+				if (member.id !== user.id) {
+					const client = activeUsers.get(member.id);
+
+					if (client && client.readyState === WebSocket.OPEN) {
+						client.send(JSON.stringify(notification));
+					}
+				}
+			});
+		}
 	});
 
 	ws.on("close", (event) => {
@@ -56,9 +73,9 @@ export const sendNotification = (userId: number, conversationId: number, message
 		console.log("User:", userId, "Online:", activeUsers.has(userId));
 
 		const notification = {
-			conversationId,
-			message
-		} satisfies Notification;
+			type: "MESSAGE",
+			data: { conversationId, message }
+		} satisfies Notification<"MESSAGE">;
 
 		client.send(JSON.stringify(notification));
 	}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import notifications from "$lib/client/notifications.svelte";
+	import {notifications} from "$lib/client/notifications.svelte";
 
 	let { children, data } = $props();
 </script>
@@ -66,6 +66,7 @@
 		}
 	}
 	main {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		row-gap: 8px;
